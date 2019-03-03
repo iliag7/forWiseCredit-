@@ -1,22 +1,22 @@
 var fs = require('fs');
 var crypto = require('crypto');
 var bodyParser = require('body-parser');
-var jsonParser = bodyParser.json();
+//var jsonParser = bodyParser.json({ type: 'application/*+json'});
+//var jsonParser = bodyParser.json();
 var express = require('express');
 var app = express.Router();//express();
 var pool = require('../db/dbconnect');
 
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 
 var dbObj = {};
 
-app.get('/', function (req, res) {
-	
+app.get('/', function (req, res) {	
   pool.getConnection(function(err, connection) {
-  if (err) throw err;
-  
+  if (err) throw err; 
   connection.query('SELECT * FROM users', function (error, results, fields) {
     connection.release();
-
     if (error) throw error;
 	resArr = '';
 	for(var rowId in results){
@@ -26,14 +26,10 @@ app.get('/', function (req, res) {
 	}
 	// res.send(resArr);
 	 dbObj = results;
-	var data = JSON.stringify({"data" : results});
-	 
-	 
-	 
+	 var data = JSON.stringify({"data" : results});	 
 	 res.render('index', {data} );
   });
  });
-
 });
 
 app.get('/token', function (req, res) {
@@ -46,8 +42,10 @@ app.get('/token', function (req, res) {
 	appendFile['token'] = mystr;
 	
 	if (fs.existsSync('token.txt')) {
-		fs.unlink('token.txt', (error) => {});
+		fs.writeFile('token.txt', '', function(){})
 	}
+	
+	//fs.openSync('token.txt', JSON.stringify(appendFile));
 
 	fs.appendFile('token.txt', JSON.stringify(appendFile), function (err) {
 		if (err) throw err;
@@ -56,12 +54,12 @@ app.get('/token', function (req, res) {
 });
 
 
-app.post('/update/:id',jsonParser, function (req, res) {
-	
+
+app.post('/update/:id', function (req, res) {
 	pool.getConnection(function(err, connection) {
   if (err) throw err; // not connected!
 
-  connection.query("UPDATE users SET name = '"+req.body.name+"' WHERE id = '"+req.params.id+"'", function (error, results, fields) {
+  connection.query("UPDATE users SET name = '"+req.body.name+"',email = '"+req.body.email+"',password = '"+req.body.password+"',token = '"+req.body.token+"' WHERE id = '"+req.params.id+"'", function (error, results, fields) {
     connection.release();
     if (error) throw error;
 	console.log(results);	
@@ -69,13 +67,14 @@ app.post('/update/:id',jsonParser, function (req, res) {
     console.error( 'MySQL close');
   });
   });
+   res.redirect('http://localhost:3000/')
  });
 });
 
-app.get('/create', function (req, res) {	
+app.post('/create', function (req, res) {	
   pool.getConnection(function(err, connection) {
   if (err) throw err; // not connected!
-  connection.query("INSERT INTO users(name,email,password) VALUES ('name2', 'new@gmail.com','1234')", function (error, results, fields) {
+  connection.query("INSERT INTO users(name,email,password,token) VALUES ('"+req.body.name+"', '"+req.body.email+"','"+req.body.password+"', '"+req.body.token+"')", function (error, results, fields) {
     connection.release();
     if (error) throw error;
 	console.log(results);
@@ -84,7 +83,7 @@ app.get('/create', function (req, res) {
  });
 });
 
-app.get('/delete/:id', function (req, res) {
+app.delete('/delete/:id', function (req, res) {
   pool.getConnection(function(err, connection) {
   if (err) throw err; 
   connection.query("DELETE FROM users WHERE id = '"+req.params.id+"'", function (error, results, fields) {
@@ -102,14 +101,16 @@ app.get('/account', function (req, res) {
   pool.getConnection(function(err, connection) {
   var token = JSON.parse(fs.readFileSync('token.txt', 'utf8'));
   
+  
   connection.query("SELECT * FROM users WHERE token = '"+token.token+"'", function (error, results, fields) {
     connection.release();
-	resArrAccount = '';
-    if (error) throw error;	
-	for(var value in results[0]){
-		resArrAccount = resArrAccount + ' ' + value + ':' +  results[0][value];
-	}	
-	res.send(resArrAccount); 
+	//resArrAccount = '';
+    //if (error) throw error;	
+	//for(var value in results[0]){
+	//	resArrAccount = resArrAccount + ' ' + value + ':' +  results[0][value];
+	//}	
+	console.log(results[0]);
+	res.send(results[0]); 
  });
  
  connection.on('close', function (err) {
