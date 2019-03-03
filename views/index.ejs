@@ -26,44 +26,47 @@
         <tbody>
 <% for(var index in JSON.parse(data).data) {%>
    <tr>
-     <td><%= JSON.parse(data).data[index].id %></td>
-	 <td><%= JSON.parse(data).data[index].name %></td>
-	 <td><%= JSON.parse(data).data[index].email %></td>
-	 <td><%= JSON.parse(data).data[index].password %></td>
-	 <td><%= JSON.parse(data).data[index].token %></td>
-	 <td><a href="/delete/<%= JSON.parse(data).data[index].id %>" class="btn btn-primary delete" role="button">Delete</a></td>
-	 <td><a href="/update/<%= JSON.parse(data).data[index].id %>" class="btn btn-primary update myBtn" role="button" data-toggle="modal" data-target="#myModal" data-id="<%= JSON.parse(data).data[index].id %>">Update</a></td>
+     <td class="id"><%= JSON.parse(data).data[index].id %></td>
+	 <td class="name"><%= JSON.parse(data).data[index].name %></td>
+	 <td class="email"><%= JSON.parse(data).data[index].email %></td>
+	 <td class="password"><%= JSON.parse(data).data[index].password %></td>
+	 <td class="token"><%= JSON.parse(data).data[index].token %></td>
+	 <td><a href="/delete/<%= JSON.parse(data).data[index].id %>" class="btn btn-primary delete" role="button" data-id="<%= JSON.parse(data).data[index].id %>">Delete</a></td>
+	 <td><a href="/update/<%= JSON.parse(data).data[index].id %>" class="btn btn-primary update myBtn" role="button" data-toggle="modal" data-target="#updateModal" data-id="<%= JSON.parse(data).data[index].id %>">Update</a></td>
    </tr>
 <% } %>
       </tbody> 
 	</table>
-	<a href="/create" class="btn btn-primary" role="button">Create</a>	
-<div class="modal" id="myModal">
+	<a class="btn btn-primary" role="button" data-toggle="modal" data-target="#createModal">Create</a>
+	<a class="btn btn-primary" role="button" data-toggle="modal" data-target="#tokenModal" id="token">Token</a>
+	<a class="btn btn-primary" role="button" data-toggle="modal" data-target="#accountModal" id="account">Account</a>
+
+<div class="modal" id="updateModal">
   <div class="modal-dialog">
     <div class="modal-content">
 
       <div class="modal-header">
-        <h4 class="modal-title">Modal Heading</h4>
+        <h4 class="modal-title">Update Row</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
 
       <div class="modal-body">
-		<form action="/update/14" method="POST" enctype="multipart/form-data">
+		<form action="" method="POST" enctype="application/json" id="update_form">
 			  <div class="form-group">
 				<label for="name">Name</label>
-				<input type="text" class="form-control" name="name" aria-describedby="basic-addon3">
+				<input type="text" class="form-control" name="name" >
 			  </div>
 			  <div class="form-group">
-				<label for="name">Email</label>
-				<input type="text" class="form-control" name="email" aria-describedby="basic-addon3">
+				<label for="email">Email</label>
+				<input type="text" class="form-control" name="email" >
 			  </div>
 			  <div class="form-group">
 				<label for="password">Password</label>
-				<input type="text" class="form-control" name="password" aria-describedby="basic-addon3">
+				<input type="text" class="form-control" name="password" >
 			  </div>
 			    <div class="form-group">
 				<label for="token">Token</label>
-				<input type="text" class="form-control" name="token" aria-describedby="basic-addon3">
+				<input type="text" class="form-control" name="token" >
 			  </div>
 			  <button  id="save-update" type="submit" class="btn btn-primary">Submit</button>
 		</form>
@@ -78,25 +81,169 @@
 </div>
 
 
-<script>
-$(document).ready(function() {
-    $('#example').DataTable({
-		"processing" : true,
-        "serverSide" : true,
-		"ajax": {
-			"url": "/",
-			"type": "GET",
-			"dataSrc": "data"
-		},		
-	});
-	$('#create').click(function(){
-		$('#example').dataTable().fnReloadAjax();
-	});
-	$('.delete').click(function(){
-		$('#example').dataTable().fnReloadAjax();
-	});
-});
+<div class="modal" id="createModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
 
+      <div class="modal-header">
+        <h4 class="modal-title">Create New</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+		<form action="/create" method="POST" enctype="application/json" id="create_form">
+			  <div class="form-group">
+				<label for="name">Name</label>
+				<input type="text" class="form-control" name="name" >
+			  </div>
+			  <div class="form-group">
+				<label for="name">Email</label>
+				<input type="text" class="form-control" name="email" >
+			  </div>
+			  <div class="form-group">
+				<label for="password">Password</label>
+				<input type="text" class="form-control" name="password" >
+			  </div>
+			    <div class="form-group">
+				<label for="token">Token</label>
+				<input type="text" class="form-control" name="token" >
+			  </div>
+			  <button  id="save-update" type="submit" class="btn btn-primary">Submit</button>
+		</form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="tokenModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h4 class="modal-title">Token</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+		<div class="form-group">
+			<input type="text" class="form-control" name="token" disabled>
+		</div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="accountModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h4 class="modal-title">Account</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+		<form id="account_form">
+			  <div class="form-group">
+				<label for="name">Name</label>
+				<input type="text" class="form-control" name="name" disabled>
+			  </div>
+			  <div class="form-group">
+				<label for="name">Email</label>
+				<input type="text" class="form-control" name="email" disabled>
+			  </div>
+			  <div class="form-group">
+				<label for="password">Password</label>
+				<input type="text" class="form-control" name="password" disabled>
+			  </div>
+			    <div class="form-group">
+				<label for="token">Token</label>
+				<input type="text" class="form-control" name="token" disabled>
+			  </div>
+		</form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+	$(document).ready(function() {
+		$('#example').DataTable({
+			"processing" : true,
+			"serverSide" : true,
+			"ajax": {
+				"url": "/",
+				"type": "GET",
+				"dataSrc": "data"
+			},		
+		});
+
+
+		$('#myModal').on('shown.bs.modal', function (e) {
+			console.log('fyhgfhg');
+		})
+	});
+	$('.update').click(function(){
+		var id = $(this).attr('data-id');
+		$('#update_form').attr('action', '/update/'+id);
+		$('#update_form input[name="name"]').val($(this).closest( "tr").find('td:eq(1)').text());
+		$('#update_form input[name="email"]').val($(this).closest( "tr").find('td:eq(2)').text());
+		$('#update_form input[name="password"]').val($(this).closest( "tr").find('td:eq(3)').text());
+		$('#update_form input[name="token"]').val($(this).closest( "tr").find('td:eq(4)').text());
+	});
+
+	$('.delete').click(function(){
+		var id = $(this).attr('data-id');
+		$.ajax({
+			url: '/delete/'+id,
+			type: 'DELETE',
+			success: function(result) {
+				// Do something with the result
+		}
+		});
+	});
+	
+	$('#token').click(function(){
+		//var id = $(this).attr('data-id');
+		$.ajax({
+			url: '/token/',
+			type: 'GET',
+			success: function(result) {
+				$('#tokenModal input[name="token"]').val(result);
+		}
+		});
+	});
+	
+	$('#account').click(function(){
+		//var id = $(this).attr('data-id');
+		$.ajax({
+			url: '/account/',
+			type: 'GET',
+			success: function(result) {
+				$('#account_form input[name="name"]').val(result.name);
+				$('#account_form input[name="email"]').val(result.email);
+				$('#account_form input[name="password"]').val(result.password);
+				$('#account_form input[name="token"]').val(result.token);
+		}
+		});
+	});
 </script>	
 
 </body>
